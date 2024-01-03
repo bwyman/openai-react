@@ -1,10 +1,9 @@
 // src/components/Chat.tsx
 import React, { useEffect, useState } from "react";
-import { TextField, Button, Container, Grid, LinearProgress, CircularProgress } from "@mui/material";
+import { TextField, Button, Container, Grid, CircularProgress, LinearProgress } from "@mui/material";
 import Message from "./Message";
 import OpenAI from "openai";
 import { MessageDto } from "../models/MessageDto";
-import SendIcon from "@mui/icons-material/Send";
 
 const Chat: React.FC = () => {
   const [isWaiting, setIsWaiting] = useState<boolean>(false);
@@ -33,13 +32,16 @@ const Chat: React.FC = () => {
       dangerouslyAllowBrowser: true,
     });
 
-    // Create an assistant
-    const assistant = await openai.beta.assistants.create({
-      name: "Hockey Expert",
-      instructions: "You are a hockey expert. You specialize in helping others learn about hockey.",
-      tools: [{ type: "code_interpreter" }],
-      model: "gpt-4-1106-preview",
-    });
+    // Use or Create an assistant
+    
+    const assistantId = "asst_RZHqfRaiWIJ1rgTxdHo1j0XP";
+
+    // const assistant = await openai.beta.assistants.create({
+    // name: "Hockey Expert",
+    //  instructions: "You are a hockey expert. You specialize in helping others learn about hockey.",
+    //  tools: [{ type: "code_interpreter" }],
+    //  model: "gpt-4-1106-preview",
+    // });
 
     // Create a thread
     const thread = await openai.beta.threads.create();
@@ -107,15 +109,13 @@ const Chat: React.FC = () => {
 
   return (
     <Container>
-      <Grid container direction="column" spacing={2} paddingBottom={2}>
+      <Grid container direction="column" spacing={2} paddingBottom={5}>
         {messages.map((message, index) => (
           <Grid item alignSelf={message.isUser ? "flex-end" : "flex-start"} key={index}>
             <Message key={index} message={message} />
           </Grid>
         ))}
-      </Grid>
-      <Grid container direction="row" paddingBottom={5} justifyContent={"space-between"}>
-        <Grid item sm={11} xs={9}>
+        <Grid item>
           <TextField
             label="Type your message"
             variant="outlined"
@@ -127,12 +127,13 @@ const Chat: React.FC = () => {
           />
           {isWaiting && <LinearProgress color="inherit" />}
         </Grid>
-        <Grid item sm={1} xs={3}>
-          <Button variant="contained" size="large" color="primary" onClick={handleSendMessage} disabled={isWaiting}>
-            {isWaiting && <CircularProgress color="inherit" />}
-            {!isWaiting && <SendIcon fontSize="large" />}
-          </Button>
-        </Grid>
+        {!isWaiting && (
+          <Grid item>
+            <Button variant="contained" color="primary" onClick={handleSendMessage} disabled={isWaiting}>
+              Send
+            </Button>
+          </Grid>
+        )}
       </Grid>
     </Container>
   );
